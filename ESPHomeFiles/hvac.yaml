@@ -1,0 +1,95 @@
+esphome:
+  name: hvac
+  platform: ESP32
+  board: featheresp32
+  includes:
+    - HVACPCB.h
+
+wifi:
+  ssid: "yourSSID"
+  password: "yourpassword"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Hvac Fallback Hotspot"
+    password: "ZHIjXO2oZBHU"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+#I2C
+i2c:
+  - id: bus_a
+    sda: 23
+    scl: 22
+    scan: True
+status_led:
+  pin: 
+    number: 13
+    
+ # Example configuration entry
+sensor:
+- platform: custom
+  lambda: |-
+    auto my_sensor = new HVACPCB();
+    App.register_component(my_sensor);
+    return {my_sensor->SDP1Temperature, my_sensor->SDP1Pressure, my_sensor->TC1_Sensor, my_sensor-> TC2_Sensor, my_sensor-> TC3_Sensor};
+
+  sensors:
+  - name: "SDP1Temperature"
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+  - name: "SDP1Pressure"
+    unit_of_measurement:  inH2O
+    accuracy_decimals: 2
+  - name: "TC1"
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+  - name: "TC2"
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+  - name: "TC3"
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+    
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO34
+      inverted: True
+      mode: INPUT_PULLUP
+    name: "HVAC Heat"
+  - platform: gpio
+    pin:
+      number: GPIO39
+      inverted: True
+      mode: INPUT
+    name: "HVAC Cool"
+  - platform: gpio
+    pin:
+      number: GPIO36
+      inverted: True
+      mode: INPUT
+    name: "HVAC Fan"
+  - platform: gpio
+    pin:
+      number: GPIO4
+      inverted: True
+      mode: INPUT_PULLUP
+    name: "HVAC H2O Detect #1"
+  - platform: gpio
+    pin:
+      number: GPIO21
+      inverted: True
+      mode: INPUT_PULLUP
+    name: "HVAC H2O Detect #2"
+  - platform: status
+    name: "HVAC Monitor Status"
+    
